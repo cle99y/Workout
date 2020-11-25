@@ -1,7 +1,10 @@
 package uk.geeklife
 
-object Config {
+class Config {
 
-    const val ZERO = 0 //Int
-    const val COUNTDOWN_TIMER_START_VALUE = 10 //Int
+    companion object {
+
+        const val ZERO = 0 //Int
+        const val COUNTDOWN_TIMER_START_VALUE = 10 //Int
+    }
 }

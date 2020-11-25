@@ -3,14 +3,15 @@ package uk.geeklife.workout
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_exercise.*
 import uk.geeklife.Config
 
 class Exercise : AppCompatActivity() {
 
-    private var mRestTime: CountDownTimer? = null
-    private var mRestProgress = Config.ZERO
+    private var restTimer: CountDownTimer? = null
+    private var restProgress = Config.ZERO
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,15 +34,16 @@ class Exercise : AppCompatActivity() {
 
     private fun setProgressBar() {
 
-        progressBar.progress = mRestProgress
-        mRestTime = object : CountDownTimer(10000, 1000) {
+        progressBar.progress = restProgress
+        restTimer = object : CountDownTimer(10000, 1000) {
 
             override fun onTick(millisUntilFinished: Long) {
 
-                val timeLeft = Config.COUNTDOWN_TIMER_START_VALUE - mRestProgress
+                Log.d("DEBUG", "$millisUntilFinished")
+                val timeLeft = Config.COUNTDOWN_TIMER_START_VALUE - restProgress
                 progressBar.progress = timeLeft
                 tvTimer.text = timeLeft.toString()
-                mRestProgress++
+                restProgress++
             }
 
             override fun onFinish() {
@@ -60,9 +62,9 @@ class Exercise : AppCompatActivity() {
 
     private fun resetCountDown() {
 
-        if (mRestTime != null) {
-            mRestTime!!.cancel()
-            mRestProgress = Config.COUNTDOWN_TIMER_START_VALUE
+        if ( restTimer!= null) {
+            restTimer!!.cancel()
+            restProgress = Config.COUNTDOWN_TIMER_START_VALUE
             tvTimer.text = Config.COUNTDOWN_TIMER_START_VALUE.toString()
         }
 
