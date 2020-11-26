@@ -10,6 +10,7 @@ import uk.geeklife.Config
 import uk.geeklife.Config.Companion.COUNTDOWN_EXERCISE_TIMER_START_VALUE
 import uk.geeklife.Config.Companion.COUNTDOWN_INTERVAL_1SEC
 import uk.geeklife.Config.Companion.COUNTDOWN_REST_TIMER_START_VALUE
+import uk.geeklife.Config.Companion.ZERO
 import uk.geeklife.config.State
 import uk.geeklife.workout.databinding.ActivityExerciseBinding
 
@@ -17,6 +18,7 @@ class Exercise : AppCompatActivity() {
 
     private var restTimer: CountDownTimer? = null
     private var restProgress = Config.ZERO
+    private var currentState = State.REST
 
     private lateinit var binding: ActivityExerciseBinding
 
@@ -32,7 +34,7 @@ class Exercise : AppCompatActivity() {
             onBackPressed()
         }
 
-        setUpRestView(State.REST)
+        setUpView(State.REST)
     }
 
 
@@ -55,13 +57,16 @@ class Exercise : AppCompatActivity() {
             }
 
             override fun onFinish() {
-                Toast.makeText(this@Exercise, "Start the exercise", Toast.LENGTH_SHORT).show()
+                when (currentState) {
+                    State.REST -> setUpView(State.EXERCISE)
+                    State.EXERCISE -> Toast.makeText(this@Exercise, "DONE", Toast.LENGTH_SHORT).show()
+                }
             }
         }.start()
 
     }
 
-    private fun setUpRestView(state: State) {
+    private fun setUpView(state: State) {
 
         when (state) {
             State.REST -> {
@@ -76,6 +81,7 @@ class Exercise : AppCompatActivity() {
             }
         }
 
+        currentState = state
 
     }
 
@@ -86,8 +92,7 @@ class Exercise : AppCompatActivity() {
         if (restTimer != null) {
 
             restTimer!!.cancel()
-            binding.progressBar.max = timeInSecs
-            restProgress = timeInSecs
+            restProgress = ZERO
             binding.tvTimer.text = timeInSecs.toString()
 
         }
