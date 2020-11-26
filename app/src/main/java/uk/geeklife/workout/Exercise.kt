@@ -7,42 +7,50 @@ import android.util.Log
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_exercise.*
 import uk.geeklife.Config
+import uk.geeklife.Config.Companion.COUNTDOWN_EXERCISE_TIMER_START_VALUE
+import uk.geeklife.Config.Companion.COUNTDOWN_INTERVAL_1SEC
+import uk.geeklife.Config.Companion.COUNTDOWN_REST_TIMER_START_VALUE
+import uk.geeklife.config.State
+import uk.geeklife.workout.databinding.ActivityExerciseBinding
 
 class Exercise : AppCompatActivity() {
 
     private var restTimer: CountDownTimer? = null
     private var restProgress = Config.ZERO
 
+    private lateinit var binding: ActivityExerciseBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_exercise)
 
-        setSupportActionBar(toolbar_exercise_activity)
+        binding = ActivityExerciseBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        setSupportActionBar(binding.toolbarExerciseActivity)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        toolbar_exercise_activity.setNavigationOnClickListener {
+        binding.toolbarExerciseActivity.setNavigationOnClickListener {
             onBackPressed()
         }
 
-        setUpRestView()
+        setUpRestView(State.REST)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        resetCountDown()
-    }
 
-    private fun setProgressBar() {
+    private fun setProgressBar(timeInSecs: Int) {
 
-        progressBar.progress = restProgress
-        restTimer = object : CountDownTimer(10000, 1000) {
+
+        val timeInMillis: Long = (timeInSecs * 1000).toLong()
+        binding.progressBar.max = timeInSecs
+
+        binding.progressBar.progress = restProgress
+        restTimer = object : CountDownTimer(timeInMillis, COUNTDOWN_INTERVAL_1SEC) {
+
 
             override fun onTick(millisUntilFinished: Long) {
 
-                Log.d("DEBUG", "$millisUntilFinished")
-                val timeLeft = Config.COUNTDOWN_TIMER_START_VALUE - restProgress
-                progressBar.progress = timeLeft
-                tvTimer.text = timeLeft.toString()
+                val timeLeft = timeInSecs - restProgress
+                binding.progressBar.progress = timeLeft
+                binding.tvTimer.text = timeLeft.toString()
                 restProgress++
             }
 
@@ -53,19 +61,35 @@ class Exercise : AppCompatActivity() {
 
     }
 
-    private fun setUpRestView() {
+    private fun setUpRestView(state: State) {
 
-        resetCountDown()
-        setProgressBar()
+        when (state) {
+            State.REST -> {
+                Log.d("DEBUG", "$state")
+                resetCountDown(COUNTDOWN_REST_TIMER_START_VALUE)
+                setProgressBar(COUNTDOWN_REST_TIMER_START_VALUE)
+            }
+            State.EXERCISE -> {
+                Log.d("DEBUG", "$state")
+                resetCountDown(COUNTDOWN_EXERCISE_TIMER_START_VALUE)
+                setProgressBar(COUNTDOWN_EXERCISE_TIMER_START_VALUE)
+            }
+        }
+
 
     }
 
-    private fun resetCountDown() {
+    private fun resetCountDown(timeInSecs: Int) {
 
-        if ( restTimer!= null) {
+        Log.d("DEBUG", "Time in seconds = $timeInSecs")
+
+        if (restTimer != null) {
+
             restTimer!!.cancel()
-            restProgress = Config.COUNTDOWN_TIMER_START_VALUE
-            tvTimer.text = Config.COUNTDOWN_TIMER_START_VALUE.toString()
+            binding.progressBar.max = timeInSecs
+            restProgress = timeInSecs
+            binding.tvTimer.text = timeInSecs.toString()
+
         }
 
     }

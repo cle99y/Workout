@@ -5,15 +5,19 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toast
+import uk.geeklife.workout.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        val tvStart = findViewById<TextView>(R.id.tv_start)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        tvStart.setOnClickListener {
+        binding.tvStart.setOnClickListener {
             val exerciseIntent = Intent(this, Exercise::class.java)
             startActivity(exerciseIntent)
         }
