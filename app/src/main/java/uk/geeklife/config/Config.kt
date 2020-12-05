@@ -12,7 +12,7 @@ class Config {
         const val COUNTDOWN_EXERCISE_TIMER_START_VALUE = 10 //Int
         const val COUNTDOWN_INTERVAL_1SEC = 1000.toLong() //Long (1000 milliseconds)
 
-        const val GET_READY_TEXT = "GET READY FOR"
+        const val GET_READY_TEXT = "GET READY FOR" // String
         const val ALL_DONE_TEXT = "Programme Finished"
 
 
