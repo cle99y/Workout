@@ -1,17 +1,25 @@
 package uk.geeklife.workout
 
+import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import android.view.WindowManager
+import android.webkit.RenderProcessGoneDetail
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_exercise.*
-import uk.geeklife.Config
-import uk.geeklife.Config.Companion.COUNTDOWN_EXERCISE_TIMER_START_VALUE
-import uk.geeklife.Config.Companion.COUNTDOWN_INTERVAL_1SEC
-import uk.geeklife.Config.Companion.COUNTDOWN_REST_TIMER_START_VALUE
-import uk.geeklife.Config.Companion.ZERO
+import uk.geeklife.config.Config
+import uk.geeklife.config.Config.Companion.ALL_DONE_TEXT
+import uk.geeklife.config.Config.Companion.COUNTDOWN_EXERCISE_TIMER_START_VALUE
+import uk.geeklife.config.Config.Companion.COUNTDOWN_INTERVAL_1SEC
+import uk.geeklife.config.Config.Companion.COUNTDOWN_REST_TIMER_START_VALUE
+import uk.geeklife.config.Config.Companion.GET_READY_TEXT
+import uk.geeklife.config.Config.Companion.ZERO
 import uk.geeklife.config.State
+import uk.geeklife.config.Utility
 import uk.geeklife.workout.databinding.ActivityExerciseBinding
 
 class Exercise : AppCompatActivity() {
@@ -19,6 +27,9 @@ class Exercise : AppCompatActivity() {
     private var restTimer: CountDownTimer? = null
     private var restProgress = Config.ZERO
     private var currentState = State.REST
+    private var exerciseList: ArrayList<ExerciseModel>? = null
+    private var selectedExercise: Int = 0 // initialised outside of array list
+    private var exerciseListSize: Int = 0 // initialise list in onCreate
 
     private lateinit var binding: ActivityExerciseBinding
 
@@ -27,6 +38,7 @@ class Exercise : AppCompatActivity() {
 
         binding = ActivityExerciseBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         setSupportActionBar(binding.toolbarExerciseActivity)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -34,6 +46,9 @@ class Exercise : AppCompatActivity() {
             onBackPressed()
         }
 
+
+        exerciseList = Utility.defaultExerciseList()
+        exerciseListSize = exerciseList!!.size
         setUpView(State.REST)
     }
 
@@ -59,7 +74,7 @@ class Exercise : AppCompatActivity() {
             override fun onFinish() {
                 when (currentState) {
                     State.REST -> setUpView(State.EXERCISE)
-                    State.EXERCISE -> Toast.makeText(this@Exercise, "DONE", Toast.LENGTH_SHORT).show()
+                    State.EXERCISE -> setUpView(State.REST)
                 }
             }
         }.start()
@@ -73,11 +88,28 @@ class Exercise : AppCompatActivity() {
                 Log.d("DEBUG", "$state")
                 resetCountDown(COUNTDOWN_REST_TIMER_START_VALUE)
                 setProgressBar(COUNTDOWN_REST_TIMER_START_VALUE)
+                binding.tvReady.text = GET_READY_TEXT
+                binding.ivExercise.visibility = GONE
+                binding.tvActivity.visibility = VISIBLE
+                binding.tvActivityName.visibility = VISIBLE
+                binding.tvActivityName.text = exerciseList!![selectedExercise + 1].getExerciseName()
+
             }
             State.EXERCISE -> {
-                Log.d("DEBUG", "$state")
-                resetCountDown(COUNTDOWN_EXERCISE_TIMER_START_VALUE)
-                setProgressBar(COUNTDOWN_EXERCISE_TIMER_START_VALUE)
+                if (selectedExercise < exerciseListSize) { // not to exceed list size
+                    selectedExercise++
+                    Log.d("DEBUG", "$state")
+                    resetCountDown(COUNTDOWN_EXERCISE_TIMER_START_VALUE)
+                    setProgressBar(COUNTDOWN_EXERCISE_TIMER_START_VALUE)
+                    binding.tvReady.text = exerciseList!![selectedExercise].getExerciseName()
+                    binding.ivExercise.setImageResource(exerciseList!![selectedExercise].getImage())
+                    binding.ivExercise.visibility = VISIBLE
+                    binding.tvActivity.visibility = GONE
+                    binding.tvActivityName.visibility = GONE
+                } else {
+                    binding.tvReady.text = ALL_DONE_TEXT
+                    binding.ivExercise.visibility = GONE
+                }
             }
         }
 
