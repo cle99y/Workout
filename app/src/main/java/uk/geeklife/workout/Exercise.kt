@@ -60,6 +60,8 @@ class Exercise : AppCompatActivity(), TextToSpeech.OnInitListener {
         exerciseList = defaultExerciseList()
         exerciseListSize = exerciseList.size
         textToSpeech = TextToSpeech(this, this)
+
+        // initialise in State.REST
         setUpView(State.REST)
     }
 
