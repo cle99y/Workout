@@ -177,6 +177,7 @@ class Exercise : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
     private fun speak(text: String) {
+        // speak text
         textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, "")
     }
 
