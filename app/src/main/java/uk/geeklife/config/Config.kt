@@ -15,6 +15,8 @@ class Config {
         const val GET_READY_TEXT = "GET READY FOR" // String
         const val ALL_DONE_TEXT = "Programme Finished"
 
+        const val REST_CHIME = R.raw.press_start // Int
+
 
 
 
